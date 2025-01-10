@@ -4,7 +4,9 @@ export const mockData = [
 ];
 
 export const mockRange = {
-  getValues: jest.fn().mockReturnValue(mockData)
+  getValues: jest.fn().mockReturnValue(mockData),
+  getRow: jest.fn().mockReturnValue(3),
+  getColumn: jest.fn().mockReturnValue(3)
 };
 
 export const mockSheet = {
@@ -13,4 +15,9 @@ export const mockSheet = {
   getLastColumn: jest.fn().mockReturnValue(2),
   getLastRow: jest.fn().mockReturnValue(2),
   getRange: jest.fn().mockReturnValue(mockRange)
+};
+
+export const mockSpreadsheet = {
+  getId: jest.fn().mockReturnValue('ss-id'),
+  getSheetByName: jest.fn().mockReturnValue(mockSheet)
 };

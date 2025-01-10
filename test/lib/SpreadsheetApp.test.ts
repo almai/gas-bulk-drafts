@@ -1,18 +1,19 @@
 import {
   getActiveSpreadsheetId,
   getDataA1ToLastRowLastCol,
+  getRangeByCellToLastRow,
   getSelectedRange,
+  getSheetByName,
+  getValuesFromRange,
   showAlert,
   showPrompt
 } from '../../src/lib/SpreadsheetApp';
-import { mockRange, mockSheet } from '../mocks/SpreadSheetApp';
+import { mockRange, mockSheet, mockSpreadsheet } from '../mocks/SpreadSheetApp';
 import { mockUi } from '../mocks/Ui';
 
 // Mock global SpreadsheetApp
 (global as any).SpreadsheetApp = {
-  getActiveSpreadsheet: jest.fn().mockReturnValue({
-    getId: jest.fn().mockReturnValue('ss-id')
-  }),
+  getActiveSpreadsheet: jest.fn().mockReturnValue(mockSpreadsheet),
   getUi: jest.fn().mockReturnValue(mockUi)
 };
 
@@ -125,6 +126,56 @@ describe('Spreadsheet Lib', () => {
       const result = showPrompt('Test title', 'Test message', 'Test Type');
 
       expect(result).toBe(testResponse);
+    });
+  });
+
+  describe('getSheetByName', () => {
+    test('returns the sheet when it exists', () => {
+      (SpreadsheetApp.getActiveSpreadsheet as any).mockReturnValue(mockSpreadsheet);
+
+      const sheetName = 'contacts';
+      const sheet = getSheetByName(sheetName);
+
+      expect(SpreadsheetApp.getActiveSpreadsheet).toHaveBeenCalled();
+      expect(SpreadsheetApp.getActiveSpreadsheet().getSheetByName).toHaveBeenCalledWith(sheetName);
+      expect(sheet).toBe(mockSheet);
+    });
+
+    test('throws error when spreadsheet does not exist', () => {
+      (SpreadsheetApp.getActiveSpreadsheet as any).mockReturnValue(null);
+
+      expect(() => getSheetByName('nonexistent')).toThrow('No active spreadsheet found');
+    });
+
+    test('throws error when sheet does not exist', () => {
+      mockSpreadsheet.getSheetByName.mockReturnValue(null);
+      (SpreadsheetApp.getActiveSpreadsheet as any).mockReturnValue(mockSpreadsheet);
+
+      expect(() => getSheetByName('nonexistent')).toThrow("Sheet with name 'nonexistent' not found");
+    });
+  });
+
+  describe('getRangeByCellToLastRow', () => {
+    test('returns the correct range from cell to last row', () => {
+      mockSheet.getRange.mockReturnValue(mockRange);
+      mockRange.getRow.mockReturnValue(3);
+      mockRange.getColumn.mockReturnValue(3);
+      mockSheet.getLastRow.mockReturnValue(10);
+      const cell = 'C3';
+
+      const range = getRangeByCellToLastRow(mockSheet as any, cell);
+
+      expect(mockSheet.getRange).toHaveBeenCalledWith(3, 3, 8);
+      expect(range).toBe(mockRange);
+    });
+  });
+
+  describe('getValuesFromRange', () => {
+    test('returns values from the given range', () => {
+      const values = getValuesFromRange(mockRange as any);
+
+      expect(mockRange.getValues).toHaveBeenCalled();
+      expect(values).toEqual(mockRange.getValues());
     });
   });
 });

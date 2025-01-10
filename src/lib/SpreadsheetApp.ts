@@ -1,4 +1,8 @@
 /**
+ * @file This file contains functions to interact with Google Sheets using Google Apps Script.
+ */
+
+/**
  * Gets the active Google Spreadsheet App UI instance
  * @returns {GoogleAppsScript.Spreadsheet.SpreadsheetApp} The active Spreadsheet App instance
  */
@@ -97,4 +101,49 @@ export const showPrompt = (title: string, msg: string, type: string): string | n
   }
 
   return txt;
+};
+
+/**
+ * Retrieves a sheet by its name from the active spreadsheet.
+ * @param {string} sheetName - The name of the sheet to retrieve.
+ * @returns {GoogleAppsScript.Spreadsheet.Sheet} The sheet with the specified name.
+ * @throws {Error} If the sheet is not found.
+ */
+export const getSheetByName = (sheetName: string): GoogleAppsScript.Spreadsheet.Sheet => {
+  const ss = getActiveSpreadsheet();
+  if (!ss) {
+    throw new Error('No active spreadsheet found');
+  }
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    throw new Error(`Sheet with name '${sheetName}' not found`);
+  }
+  return sheet;
+};
+
+/**
+ * Retrieves a range from a starting cell to the last occupied row in the sheet.
+ * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to retrieve the range from.
+ * @param {string} cell - The A1 notation of the starting cell.
+ * @returns {GoogleAppsScript.Spreadsheet.Range} The range from the starting cell to the last row.
+ */
+export const getRangeByCellToLastRow = (
+  sheet: GoogleAppsScript.Spreadsheet.Sheet,
+  cell: string
+): GoogleAppsScript.Spreadsheet.Range => {
+  const startRange = sheet.getRange(cell);
+  const startRow = startRange.getRow();
+  const startColumn = startRange.getColumn();
+  const lastRow = sheet.getLastRow();
+  const numRows = lastRow - startRow + 1;
+  return sheet.getRange(startRow, startColumn, numRows);
+};
+
+/**
+ * Retrieves the values from the given range.
+ * @param {GoogleAppsScript.Spreadsheet.Range} range - The range to get values from.
+ * @returns {any[][]} The values in the range.
+ */
+export const getValuesFromRange = (range: GoogleAppsScript.Spreadsheet.Range): any[][] => {
+  return range.getValues();
 };

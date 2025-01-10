@@ -10,10 +10,10 @@ describe('GmailApp Lib', () => {
   beforeEach(() => jest.clearAllMocks());
 
   describe('createDraft', () => {
-    test('finds element by ID successfully', () => {
-      const email = 'test@test.de';
-      const subject = 'Test subject';
-      const message = 'Test message';
+    test('creates a draft email with given parameters', () => {
+      const email = 'test@example.com';
+      const subject = 'Test Subject';
+      const message = 'Test Message';
 
       createDraft(email, subject, message);
 
