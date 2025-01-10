@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "target": "ES5",
+    "module": "ES2015",
+    "moduleResolution": "node",
+    "lib": ["ES2015"],
+    "types": ["node", "@types/google-apps-script", "jest"],
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
