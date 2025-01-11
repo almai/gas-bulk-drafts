@@ -1,7 +1,9 @@
 /**
  * @file This file contains functions to interact with Google Sheets using Google Apps Script.
  */
-import { Contact, Employee } from '../models';
+import { contactKeys } from '../constants/contact';
+import { templateData } from '../constants/template-data';
+import { Contact } from '../models';
 
 /**
  * Gets the active Google Spreadsheet App UI instance
@@ -150,14 +152,14 @@ export const getValuesFromRange = (range: GoogleAppsScript.Spreadsheet.Range): a
 };
 
 /**
- * Retrieves an array of Contact or Employee objects from the specified sheet.
+ * Retrieves an array of Contact objects from the specified sheet.
  * @param {string} sheetName - The name of the sheet to retrieve data from.
- * @returns {Contact[] | Employee[]} An array of Contact or Employee objects.
+ * @returns {Contact[]} An array of Contact objects.
  * @throws {Error} If the sheet is empty or contains only headers.
  * @throws {Error} If the required columns are not found in the sheet.
  * @throws {Error} If the sheet name is invalid.
  */
-export const getPersonArrayFromSheet = (sheetName: string): Contact[] | Employee[] => {
+export const getPersonArrayFromSheet = (sheetName: string): Contact[] => {
   const sheet = getSheetByName(sheetName);
   const data = getDataA1ToLastRowLastCol(sheet);
 
@@ -169,16 +171,10 @@ export const getPersonArrayFromSheet = (sheetName: string): Contact[] | Employee
   const rows = data.slice(1);
 
   // Define required keys based on sheet name
-  const requiredKeys =
-    // eslint-disable-next-line no-nested-ternary
-    sheetName === 'contacts'
-      ? ['id', 'firstName', 'lastName', 'email', 'gender', 'language', 'isActive', 'formal', 'employeeId', 'contactFor']
-      : sheetName === 'employees'
-        ? ['id', 'firstName', 'lastName', 'email', 'gender', 'language', 'isActive', 'internal']
-        : null;
+  const requiredKeys = sheetName === 'contacts' ? contactKeys : null;
 
   if (!requiredKeys) {
-    throw new Error(`Invalid sheet name: ${sheetName}`);
+    throw new Error(`Invalid sheet name: ${sheetName}. Only 'contacts' is supported.`);
   }
 
   const headerIndexMap = new Map<string, number>();
@@ -201,6 +197,74 @@ export const getPersonArrayFromSheet = (sheetName: string): Contact[] | Employee
       headerIndexMap.forEach((index, key) => {
         person[key] = row[index];
       });
-      return person as Contact | Employee;
+      return person as Contact;
     });
+};
+
+export const getTemplateWithSubstitutions = (
+  contact: Contact,
+  templateName: 'subject' | 'salutation' | 'msg'
+): string => {
+  // Get the Config sheet and its data
+  const configSheet = getSheetByName('Config');
+  const configData = getDataA1ToLastRowLastCol(configSheet);
+
+  // Load all templates from template-data and create a new object to store processed templates
+  const templates = Object.entries(templateData).reduce(
+    (acc, [key, template]) => {
+      // Create a new template object for each template
+      const processedTemplate = {
+        ...template,
+        content: template.content
+      };
+
+      // Find and populate template content from Config sheet
+      const rowIndex = configData.findIndex(row => row[0] === template.name);
+      if (rowIndex !== -1) {
+        let content = configData[rowIndex][1];
+
+        // Replace variables in content
+        template.variables.forEach((variable: string) => {
+          const placeholder = `{{${variable}}}`;
+          // Use type assertion to tell TypeScript that variable is a key of Contact
+          const value = contact[variable as keyof Contact];
+          content = content.replace(placeholder, value as string);
+        });
+
+        processedTemplate.content = content;
+      }
+
+      return {
+        ...acc,
+        [key]: processedTemplate
+      };
+    },
+    {} as typeof templateData
+  );
+
+  if (templateName === 'subject') {
+    return contact.language === 'de' ? templates.subjectDe.content : templates.subjectEn.content;
+  }
+
+  if (templateName === 'salutation') {
+    if (contact.formal) {
+      if (contact.language === 'de') {
+        return contact.gender === 'male'
+          ? templates.salutationDeFormalMale.content
+          : templates.salutationDeFormalFemale.content;
+      }
+
+      return contact.gender === 'male'
+        ? templates.salutationEnFormalMale.content
+        : templates.salutationEnFormalFemale.content;
+    }
+
+    return contact.language === 'de' ? templates.salutationDeCasual.content : templates.salutationEnCasual.content;
+  }
+
+  if (templateName === 'msg') {
+    return contact.language === 'de' ? templates.msgDe.content : templates.msgEn.content;
+  }
+
+  throw new Error(`Invalid template name: ${templateName}`);
 };

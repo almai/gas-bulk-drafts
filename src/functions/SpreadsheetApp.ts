@@ -7,10 +7,12 @@ import {
   getPersonArrayFromSheet,
   getRangeByCellToLastRow,
   getSheetByName,
+  getTemplateWithSubstitutions,
   getValuesFromRange,
   showAlert,
   showPrompt
 } from '../lib/SpreadsheetApp';
+import { Contact } from '../models';
 
 const DOC_ID = '1LKgyifuAPKvM99jZKIaRlI3BdtwGVmEgl0BTr5pKlQs';
 
@@ -53,15 +55,25 @@ export const createDraftEmailsFromRange = (): void => {
  * @throws {Error} If no active contacts are found in the sheet
  */
 export const createDraftEmailsFromContacts = (): void => {
-  const contacts = getPersonArrayFromSheet('contacts');
+  const contacts = getPersonArrayFromSheet('contacts') as Contact[];
 
-  if (contacts.length === 0) {
-    throw new Error('No active contacts found in sheet');
+  // Filter out inactive and internal contacts
+  const activeExternalContacts = contacts.filter((contact: Contact) => contact.isActive && !contact.isInternal);
+
+  if (activeExternalContacts.length === 0) {
+    throw new Error('No active external contacts found in sheet');
   }
 
-  contacts.forEach(contact => {
+  activeExternalContacts.forEach(contact => {
     if (contact.email) {
-      createDraft(contact.email, 'Subject', 'Message body');
+      const subject = getTemplateWithSubstitutions(contact, 'subject');
+      const salutation = getTemplateWithSubstitutions(contact, 'salutation');
+      const message = getTemplateWithSubstitutions(contact, 'msg');
+
+      // Combine salutation and message with a newline
+      const emailBody = `${salutation}\n\n${message}`;
+
+      createDraft(contact.email, subject, emailBody);
     }
   });
 };

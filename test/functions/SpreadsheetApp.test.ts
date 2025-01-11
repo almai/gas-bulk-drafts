@@ -9,6 +9,7 @@ import {
   getPersonArrayFromSheet,
   getRangeByCellToLastRow,
   getSheetByName,
+  getTemplateWithSubstitutions,
   getValuesFromRange,
   showAlert,
   showPrompt
@@ -24,7 +25,8 @@ jest.mock('../../src/lib/SpreadsheetApp', () => ({
   getSheetByName: jest.fn(),
   getRangeByCellToLastRow: jest.fn(),
   getValuesFromRange: jest.fn(),
-  getPersonArrayFromSheet: jest.fn()
+  getPersonArrayFromSheet: jest.fn(),
+  getTemplateWithSubstitutions: jest.fn()
 }));
 
 jest.mock('../../src/lib/GmailApp', () => ({
@@ -32,7 +34,21 @@ jest.mock('../../src/lib/GmailApp', () => ({
 }));
 
 describe('SpreadsheetApp Functions', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getTemplateWithSubstitutions as jest.Mock).mockImplementation((contact, type) => {
+      switch (type) {
+        case 'subject':
+          return 'Test Subject';
+        case 'salutation':
+          return 'Dear Test Person';
+        case 'msg':
+          return 'Test Message Body';
+        default:
+          return '';
+      }
+    });
+  });
 
   describe('sayHelloSpreadsheet', () => {
     test('should show alert with hello message', () => {
@@ -67,22 +83,34 @@ describe('SpreadsheetApp Functions', () => {
   describe('createDraftEmailsFromContacts', () => {
     test('creates draft emails for active contacts', () => {
       const mockContacts = [
-        { email: 'test1@maiburg.com', isActive: true },
-        { email: 'test3@maiburg.com', isActive: true }
+        { 
+          email: 'test1@maiburg.com', 
+          isActive: true, 
+          isInternal: false,
+          firstName: 'Test',
+          lastName: 'User',
+          language: 'en',
+          formal: true,
+          gender: 'male',
+          id: 1
+        }
       ];
       (getPersonArrayFromSheet as jest.Mock).mockReturnValue(mockContacts);
 
       createDraftEmailsFromContacts();
 
-      expect(createDraft).toHaveBeenCalledTimes(2);
-      expect(createDraft).toHaveBeenCalledWith('test1@maiburg.com', 'Subject', 'Message body');
-      expect(createDraft).toHaveBeenCalledWith('test3@maiburg.com', 'Subject', 'Message body');
+      expect(createDraft).toHaveBeenCalledTimes(1);
+      expect(createDraft).toHaveBeenCalledWith(
+        'test1@maiburg.com',
+        'Test Subject',
+        'Dear Test Person\n\nTest Message Body'
+      );
     });
 
     test('throws error when no active contacts found', () => {
       (getPersonArrayFromSheet as jest.Mock).mockReturnValue([]);
 
-      expect(() => createDraftEmailsFromContacts()).toThrow('No active contacts found in sheet');
+      expect(() => createDraftEmailsFromContacts()).toThrow('No active external contacts found in sheet');
     });
   });
 });

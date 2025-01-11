@@ -200,12 +200,13 @@ describe('Spreadsheet Lib', () => {
     test('returns array of active contacts when sheet name is contacts', () => {
       const contacts = getPersonArrayFromSheet('contacts');
 
-      expect(contacts).toHaveLength(3); // Only active contacts
+      expect(contacts).toHaveLength(4); // Update to expect 4 active contacts
       expect(contacts[0]).toMatchObject({
         id: 1,
         firstName: 'Dario',
-        email: 'test1@maiburg.com',
-        isActive: true
+        email: 'test11@maiburg.com',
+        isActive: true,
+        isInternal: false // Add this to explicitly check
       });
     });
 
@@ -214,17 +215,17 @@ describe('Spreadsheet Lib', () => {
       (global as any).SpreadsheetApp.getActiveSpreadsheet = jest.fn().mockReturnValue({
         getSheetByName: jest.fn().mockReturnValue({
           getLastRow: jest.fn().mockReturnValue(2),
-          getLastColumn: jest.fn().mockReturnValue(2),
+          getLastColumn: jest.fn().mockReturnValue(9),
           getRange: jest.fn().mockReturnValue({
             getValues: jest.fn().mockReturnValue([
-              ['id', 'firstName'],
-              ['1', 'Test']
+              ['id', 'firstName', 'lastName', 'email', 'gender', 'language', 'isActive', 'formal'], // missing isInternal
+              ['1', 'Test', 'User', 'test@example.com', 'male', 'en', true, false]
             ])
           })
         })
       });
 
-      expect(() => getPersonArrayFromSheet('contacts')).toThrow(/Required column/);
+      expect(() => getPersonArrayFromSheet('contacts')).toThrow("Required column 'isInternal' not found in sheet");
     });
 
     test('throws error for invalid sheet name', () => {
