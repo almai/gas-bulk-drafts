@@ -7,7 +7,6 @@
     "plugin:prettier/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
-    "plugin:jest/recommended",
     "plugin:@typescript-eslint/recommended"
   ],
   "parserOptions": {
@@ -21,7 +20,6 @@
     "browser": true,
     "es6": true,
     "node": true,
-    "jest": true,
     "googleappsscript/googleappsscript": true
   },
   "ignorePatterns": ["node_modules/"],

@@ -5,7 +5,7 @@
     "module": "ES2015",
     "moduleResolution": "node",
     "lib": ["ES2015"],
-    "types": ["node", "@types/google-apps-script", "jest"],
+    "types": ["node", "@types/google-apps-script"],
     "skipLibCheck": true,
     "esModuleInterop": true
   },

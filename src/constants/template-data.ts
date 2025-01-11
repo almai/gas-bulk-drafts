@@ -7,7 +7,7 @@ export const templateData: TemplateData = {
     description: 'Subject of the email in German',
     content: undefined,
     language: 'de',
-    variables: ['firstName', 'lastName']
+    variables: ['employeeFirstName', 'employeeLastName']
   },
   subjectEn: {
     id: 2,
@@ -73,7 +73,11 @@ export const templateData: TemplateData = {
     language: 'de',
     variables: [
       'firstName',
-      'lastName'
+      'lastName',
+      'employeeFirstName',
+      'employeeLastName',
+      'employeePersonalPronoun',
+      'employeePossessivePronoun'
     ]
   },
   msgEn: {

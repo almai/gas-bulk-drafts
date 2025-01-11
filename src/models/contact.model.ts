@@ -8,4 +8,11 @@ export interface Contact {
   formal: boolean;
   isInternal: boolean;
   isActive: boolean;
+  employeeId: number;
+  employeeFirstName: string;
+  employeeLastName: string;
+  employeeGender: 'male' | 'female';
+  employeeIsActive: boolean;
+  employeePersonalPronoun: 'er' | 'sie' | 'he' | 'she';
+  employeePossessivePronoun: 'sein' | 'ihr' | 'his' | 'her';
 }

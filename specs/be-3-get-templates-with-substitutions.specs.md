@@ -149,8 +149,6 @@ Get templates for subject, salutation and message body with substitutions for a 
 ⚠️Heads-up: The contacts table has changed:
 
 ```aider
-   UPDATE test/mocks/SpreasheetApp.ts:
-        UPDATE test data to test against according to the new contacts table
     |id |firstName|lastName |email             |gender|formal|language|isInternal|isActive|employeeId|employeeFirstName|employeeLastName|employeeGender|employeeIsActive|employeePersonalPronoun|employeePossessivePronoun|
     |---|---------|---------|------------------|------|------|--------|----------|--------|----------|-----------------|----------------|--------------|----------------|-----------------------|-------------------------|
     |1  |Dario    |Soller   |test11@maiburg.com|male  |TRUE  |de      |FALSE     |TRUE    |2         |Robert           |Schwarz         |male          |TRUE            |er                     |sein                     |

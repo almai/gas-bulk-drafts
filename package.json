@@ -7,14 +7,9 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "npx webpack",
-    "watch": "npx webpack --watch",
-    "lint": "npx eslint --fix --no-error-on-unmatched-pattern src/ test/",
-    "format": "prettier --write dist/code.js",
-    "test": "jest --config jest.config.js",
-    "postbuild": "npm run format",
+    "lint": "npx eslint --fix --no-error-on-unmatched-pattern src/",
     "upload": "npx clasp push",
-    "deploy": "npm run build && npm run upload",
-    "docs": "typedoc"
+    "deploy": "npm run build && npm run upload"
   },
   "repository": {
     "type": "git",
@@ -32,7 +27,6 @@
     "@types/google-apps-script": "^1.0.86",
     "@types/google-apps-script-oauth2": "^38.0.4",
     "@types/google.picker": "^0.0.42",
-    "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "@typescript-eslint/parser": "^7.6.0",
     "copy-webpack-plugin": "^12.0.2",
@@ -43,15 +37,10 @@
     "eslint-plugin-googleappsscript": "^1.0.5",
     "eslint-plugin-html": "^8.1.2",
     "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jest": "^28.6.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-webpack-plugin": "^4.2.0",
     "gas-webpack-plugin": "^2.6.0",
-    "jest": "^29.7.0",
-    "prettier": "^3.3.2",
-    "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
-    "typedoc": "^0.27.4",
     "typescript": "^5.7.2",
     "webpack": "^5.92.1",
     "webpack-cli": "^5.1.4"
