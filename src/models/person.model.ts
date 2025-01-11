@@ -1,0 +1,10 @@
+export interface Person {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  gender: string;
+  language: string;
+  isActive: boolean;
+  internal: boolean;
+}

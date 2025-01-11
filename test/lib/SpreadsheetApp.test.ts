@@ -1,6 +1,7 @@
 import {
   getActiveSpreadsheetId,
   getDataA1ToLastRowLastCol,
+  getPersonArrayFromSheet,
   getRangeByCellToLastRow,
   getSelectedRange,
   getSheetByName,
@@ -8,17 +9,33 @@ import {
   showAlert,
   showPrompt
 } from '../../src/lib/SpreadsheetApp';
-import { mockRange, mockSheet, mockSpreadsheet } from '../mocks/SpreadSheetApp';
+import { mockContactsData, mockRange, mockSheet, mockSpreadsheet } from '../mocks/SpreadSheetApp';
 import { mockUi } from '../mocks/Ui';
 
-// Mock global SpreadsheetApp
-(global as any).SpreadsheetApp = {
-  getActiveSpreadsheet: jest.fn().mockReturnValue(mockSpreadsheet),
-  getUi: jest.fn().mockReturnValue(mockUi)
-};
-
 describe('Spreadsheet Lib', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Set up the SpreadsheetApp mock for each test
+    (global as any).SpreadsheetApp = {
+      getActiveSpreadsheet: jest.fn().mockReturnValue({
+        getId: jest.fn().mockReturnValue('ss-id'),
+        getSheetByName: jest.fn().mockImplementation((name: string) => {
+          if (name === 'contacts') {
+            return {
+              getLastRow: jest.fn().mockReturnValue(mockContactsData.length),
+              getLastColumn: jest.fn().mockReturnValue(mockContactsData[0].length),
+              getRange: jest.fn().mockImplementation((row, col, numRows, numCols) => ({
+                getValues: jest.fn().mockReturnValue(mockContactsData)
+              }))
+            };
+          }
+          return null;
+        })
+      }),
+      getUi: jest.fn().mockReturnValue(mockUi)
+    };
+  });
 
   describe('getActiveSpreadsheetId', () => {
     test('returns the id of the active spreadsheet', () => {
@@ -176,6 +193,47 @@ describe('Spreadsheet Lib', () => {
 
       expect(mockRange.getValues).toHaveBeenCalled();
       expect(values).toEqual(mockRange.getValues());
+    });
+  });
+
+  describe('getPersonArrayFromSheet', () => {
+    test('returns array of active contacts when sheet name is contacts', () => {
+      const contacts = getPersonArrayFromSheet('contacts');
+
+      expect(contacts).toHaveLength(3); // Only active contacts
+      expect(contacts[0]).toMatchObject({
+        id: 1,
+        firstName: 'Dario',
+        email: 'test1@maiburg.com',
+        isActive: true
+      });
+    });
+
+    test('throws error when required column is missing', () => {
+      // Override the mock implementation for this specific test
+      (global as any).SpreadsheetApp.getActiveSpreadsheet = jest.fn().mockReturnValue({
+        getSheetByName: jest.fn().mockReturnValue({
+          getLastRow: jest.fn().mockReturnValue(2),
+          getLastColumn: jest.fn().mockReturnValue(2),
+          getRange: jest.fn().mockReturnValue({
+            getValues: jest.fn().mockReturnValue([
+              ['id', 'firstName'],
+              ['1', 'Test']
+            ])
+          })
+        })
+      });
+
+      expect(() => getPersonArrayFromSheet('contacts')).toThrow(/Required column/);
+    });
+
+    test('throws error for invalid sheet name', () => {
+      // Override the mock implementation for invalid sheet name
+      (global as any).SpreadsheetApp.getActiveSpreadsheet = jest.fn().mockReturnValue({
+        getSheetByName: jest.fn().mockReturnValue(null)
+      });
+
+      expect(() => getPersonArrayFromSheet('invalid')).toThrow(/Sheet with name 'invalid' not found/);
     });
   });
 });

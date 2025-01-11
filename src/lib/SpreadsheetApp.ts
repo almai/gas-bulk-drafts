@@ -1,6 +1,7 @@
 /**
  * @file This file contains functions to interact with Google Sheets using Google Apps Script.
  */
+import { Contact, Employee } from '../models';
 
 /**
  * Gets the active Google Spreadsheet App UI instance
@@ -146,4 +147,60 @@ export const getRangeByCellToLastRow = (
  */
 export const getValuesFromRange = (range: GoogleAppsScript.Spreadsheet.Range): any[][] => {
   return range.getValues();
+};
+
+/**
+ * Retrieves an array of Contact or Employee objects from the specified sheet.
+ * @param {string} sheetName - The name of the sheet to retrieve data from.
+ * @returns {Contact[] | Employee[]} An array of Contact or Employee objects.
+ * @throws {Error} If the sheet is empty or contains only headers.
+ * @throws {Error} If the required columns are not found in the sheet.
+ * @throws {Error} If the sheet name is invalid.
+ */
+export const getPersonArrayFromSheet = (sheetName: string): Contact[] | Employee[] => {
+  const sheet = getSheetByName(sheetName);
+  const data = getDataA1ToLastRowLastCol(sheet);
+
+  if (data.length < 2) {
+    throw new Error('Sheet is empty or contains only headers');
+  }
+
+  const headers = data[0];
+  const rows = data.slice(1);
+
+  // Define required keys based on sheet name
+  const requiredKeys =
+    // eslint-disable-next-line no-nested-ternary
+    sheetName === 'contacts'
+      ? ['id', 'firstName', 'lastName', 'email', 'gender', 'language', 'isActive', 'formal', 'employeeId', 'contactFor']
+      : sheetName === 'employees'
+        ? ['id', 'firstName', 'lastName', 'email', 'gender', 'language', 'isActive', 'internal']
+        : null;
+
+  if (!requiredKeys) {
+    throw new Error(`Invalid sheet name: ${sheetName}`);
+  }
+
+  const headerIndexMap = new Map<string, number>();
+
+  requiredKeys.forEach(key => {
+    const index = headers.findIndex(h => h.toLowerCase() === key.toLowerCase());
+    if (index === -1) {
+      throw new Error(`Required column '${key}' not found in sheet`);
+    }
+    headerIndexMap.set(key, index);
+  });
+
+  return rows
+    .filter(row => {
+      const isActive = row[headerIndexMap.get('isActive')];
+      return isActive === true || isActive === 'TRUE';
+    })
+    .map(row => {
+      const person: any = {};
+      headerIndexMap.forEach((index, key) => {
+        person[key] = row[index];
+      });
+      return person as Contact | Employee;
+    });
 };

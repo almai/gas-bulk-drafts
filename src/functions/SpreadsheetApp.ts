@@ -4,6 +4,7 @@
 
 import { createDraft } from '../lib/GmailApp';
 import {
+  getPersonArrayFromSheet,
   getRangeByCellToLastRow,
   getSheetByName,
   getValuesFromRange,
@@ -42,6 +43,25 @@ export const createDraftEmailsFromRange = (): void => {
     const email = row[0];
     if (email) {
       createDraft(email, 'Subject', 'Message body');
+    }
+  });
+};
+
+/**
+ * Creates draft emails for each email address in the Contacts sheet.
+ * @returns {void}
+ * @throws {Error} If no active contacts are found in the sheet
+ */
+export const createDraftEmailsFromContacts = (): void => {
+  const contacts = getPersonArrayFromSheet('contacts');
+
+  if (contacts.length === 0) {
+    throw new Error('No active contacts found in sheet');
+  }
+
+  contacts.forEach(contact => {
+    if (contact.email) {
+      createDraft(contact.email, 'Subject', 'Message body');
     }
   });
 };
