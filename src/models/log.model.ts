@@ -1,3 +1,7 @@
+/**
+ * @file This file defines the data model for the log.
+ */
+
 export interface Log {
   contactId: number;
   firstName: string;
