@@ -2,8 +2,8 @@
  * @file This file contains modules to interact with Google Sheets using Google Apps Script.
  */
 import { contactKeys, templateData } from '../constants';
-import { Contact } from '../models';
-import { createDraft } from './GmailApp';
+import { Contact, Log } from '../models';
+import { getDraft } from './GmailApp';
 
 /**
  * Retrieves data from cell A1 to the last occupied row and column in the given sheet.
@@ -152,6 +152,31 @@ export const getTemplateWithSubstitutions = (
 };
 
 /**
+ * Writes email draft creation log to the Log sheet
+ * @param {Log} log - The log entry to write
+ */
+export const logEmailDraftCreation = (log: Log): void => {
+  const sheet = getSheetByName('Log');
+  const data = getDataA1ToLastRowLastCol(sheet);
+  const headers = data[0];
+  const nextRow = sheet.getLastRow() + 1;
+
+  // Create a map of header names to column indices
+  const headerMap = headers.reduce((acc: { [key: string]: number }, header: string, index: number) => {
+    acc[header.toLowerCase()] = index + 1;
+    return acc;
+  }, {});
+
+  // Write each log property to the corresponding column
+  Object.entries(log).forEach(([key, value]) => {
+    const colIndex = headerMap[key.toLowerCase()];
+    if (colIndex) {
+      sheet.getRange(nextRow, colIndex).setValue(value);
+    }
+  });
+};
+
+/**
  * Shows a toast message in the spreadsheet UI
  * @param {boolean} success - Whether the operation was successful
  */
@@ -191,7 +216,19 @@ export const createDraftEmailsFromContacts = (): void => {
         // Combine salutation and message with a newline
         const emailBody = `${salutation}\n\n${message}`;
 
-        createDraft(contact.email, subject, emailBody);
+        const draft = getDraft(contact.email, subject, emailBody);
+
+        // Create and write log entry
+        const log: Log = {
+          contactId: contact.id,
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+          email: contact.email,
+          gmailId: draft.getId(),
+          draftUrl: `https://mail.google.com/mail/u/0/#drafts?compose=${draft.getMessageId()}`,
+          timestamp: new Date()
+        };
+        logEmailDraftCreation(log);
       }
     });
     draftCreationSuccess(true);

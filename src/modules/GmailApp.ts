@@ -3,11 +3,11 @@
  */
 
 /**
- * Creates a new draft email
- * @param {string} email - The email address of the recipient
- * @param {string} subject - The subject of the email
- * @param {string} message - The body of the email
+ * Returns a new draft email
+ * @param {string} email - The recipient email address
+ * @param {string} subject - The email subject
+ * @param {string} message - The email message
  */
-export const createDraft = (email: string, subject: string, message: string): void => {
-  GmailApp.createDraft(email, subject, message);
+export const getDraft = (email: string, subject: string, message: string): GoogleAppsScript.Gmail.GmailDraft => {
+  return GmailApp.createDraft(email, subject, message);
 };
