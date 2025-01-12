@@ -152,6 +152,19 @@ export const getTemplateWithSubstitutions = (
 };
 
 /**
+ * Shows a toast message in the spreadsheet UI
+ * @param {boolean} success - Whether the operation was successful
+ */
+export const draftCreationSuccess = (success: boolean): void => {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (success) {
+    ss.toast('Emails created successfully!', '✅ Success', 5);
+  } else {
+    ss.toast('Could not send emails. Please try again.', '❌ Error', 5);
+  }
+};
+
+/**
  * Creates draft emails for each email address in the Contacts sheet.
  * @returns {void}
  * @throws {Error} If no active contacts are found in the sheet
@@ -168,16 +181,22 @@ export const createDraftEmailsFromContacts = (): void => {
     throw new Error('No active external contacts found in sheet');
   }
 
-  activeExternalContacts.forEach(contact => {
-    if (contact.email) {
-      const subject = getTemplateWithSubstitutions(contact, 'subject');
-      const salutation = getTemplateWithSubstitutions(contact, 'salutation');
-      const message = getTemplateWithSubstitutions(contact, 'msg');
+  try {
+    activeExternalContacts.forEach(contact => {
+      if (contact.email) {
+        const subject = getTemplateWithSubstitutions(contact, 'subject');
+        const salutation = getTemplateWithSubstitutions(contact, 'salutation');
+        const message = getTemplateWithSubstitutions(contact, 'msg');
 
-      // Combine salutation and message with a newline
-      const emailBody = `${salutation}\n\n${message}`;
+        // Combine salutation and message with a newline
+        const emailBody = `${salutation}\n\n${message}`;
 
-      createDraft(contact.email, subject, emailBody);
-    }
-  });
+        createDraft(contact.email, subject, emailBody);
+      }
+    });
+    draftCreationSuccess(true);
+  } catch (error) {
+    draftCreationSuccess(false);
+    throw error;
+  }
 };
