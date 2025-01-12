@@ -5,17 +5,20 @@ import { contactKeys, templateData } from '../constants';
 import { Contact, Log } from '../models';
 import { getDraft } from './GmailApp';
 
+let globalTemplateData: typeof templateData | null = null;
+let globalDocId: string | null = null;
+
 /**
  * Retrieves data from cell A1 to the last occupied row and column in the given sheet.
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - The sheet to retrieve data from.
  * @returns {any[][]} The data within the range from A1 to the last row and column.
  */
-export const getDataA1ToLastRowLastCol = (sheet: GoogleAppsScript.Spreadsheet.Sheet): any[][] => {
+function getDataA1ToLastRowLastCol(sheet: GoogleAppsScript.Spreadsheet.Sheet): any[][] {
   const lastRow = sheet.getLastRow();
   const lastColumn = sheet.getLastColumn();
   const range = sheet.getRange(1, 1, lastRow, lastColumn);
   return range.getValues();
-};
+}
 
 /**
  * Retrieves a sheet by its name from the active spreadsheet.
@@ -23,7 +26,7 @@ export const getDataA1ToLastRowLastCol = (sheet: GoogleAppsScript.Spreadsheet.Sh
  * @returns {GoogleAppsScript.Spreadsheet.Sheet} The sheet with the specified name.
  * @throws {Error} If the sheet is not found.
  */
-export const getSheetByName = (sheetName: string): GoogleAppsScript.Spreadsheet.Sheet => {
+function getSheetByName(sheetName: string): GoogleAppsScript.Spreadsheet.Sheet {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) {
     throw new Error('No active spreadsheet found');
@@ -33,16 +36,61 @@ export const getSheetByName = (sheetName: string): GoogleAppsScript.Spreadsheet.
     throw new Error(`Sheet with name '${sheetName}' not found`);
   }
   return sheet;
-};
+}
+
+/**
+ * Retrieves template data from the Config sheet and processes it.
+ * @returns {typeof templateData} An object containing processed template data.
+ */
+function getTemplateData(): typeof templateData {
+  // If data is already loaded, return it
+  if (globalTemplateData) {
+    return globalTemplateData;
+  }
+
+  // Get the Config sheet and its data
+  const sheet = getSheetByName('config');
+  const data = getDataA1ToLastRowLastCol(sheet);
+
+  // Load all templates and create processed templates
+  globalTemplateData = Object.entries(templateData).reduce(
+    (acc, [key, template]) => {
+      const processedTemplate = {
+        ...template,
+        content: template.content
+      };
+
+      const rowIndex = data.findIndex(row => row[0] === template.name);
+      if (rowIndex !== -1) {
+        const [, content] = data[rowIndex];
+        processedTemplate.content = content;
+      }
+
+      return {
+        ...acc,
+        [key]: processedTemplate
+      };
+    },
+    {} as typeof templateData
+  );
+
+  // Find and store docId
+  const docIdRow = data.find(row => row[0] === 'docId');
+  if (docIdRow) {
+    const [, id] = docIdRow;
+    globalDocId = id;
+  }
+
+  return globalTemplateData;
+}
 
 /**
  * Retrieves an array of Contact objects from the specified sheet.
- * @param {string} sheetName - The name of the sheet to retrieve data from.
  * @returns {Contact[]} An array of Contact objects.
  * @throws {Error} If the sheet is empty or contains only headers.
  * @throws {Error} If the required columns are not found in the sheet.
  */
-export const getContactsArray = (): Contact[] => {
+function getContactsArray(): Contact[] {
   const sheet = getSheetByName('contacts');
   const data = getDataA1ToLastRowLastCol(sheet);
 
@@ -74,7 +122,7 @@ export const getContactsArray = (): Contact[] => {
       });
       return contact;
     });
-};
+}
 
 /**
  * Retrieves a template with variables replaced by values from the Config sheet.
@@ -83,79 +131,48 @@ export const getContactsArray = (): Contact[] => {
  * @returns {string} The template content with variables replaced by values.
  * @throws {Error} If an invalid template name is provided.
  */
-export const getTemplateWithSubstitutions = (
-  contact: Contact,
-  templateName: 'subject' | 'salutation' | 'msg'
-): string => {
-  // Get the Config sheet and its data
-  const sheet = getSheetByName('Config');
-  const data = getDataA1ToLastRowLastCol(sheet);
-
-  // Load all templates from template-data and create a new object to store processed templates
-  const templates = Object.entries(templateData).reduce(
-    (acc, [key, template]) => {
-      // Create a new template object for each template
-      const processedTemplate = {
-        ...template,
-        content: template.content
-      };
-
-      // Find and populate template content from Config sheet
-      const rowIndex = data.findIndex(row => row[0] === template.name);
-      if (rowIndex !== -1) {
-        let content = data[rowIndex][1];
-
-        // Replace variables in content
-        template.variables.forEach((variable: string) => {
-          const placeholder = `{{${variable}}}`;
-          // Use type assertion to tell TypeScript that variable is a key of Contact
-          const value = contact[variable as keyof Contact];
-          content = content.replace(placeholder, value as string);
-        });
-
-        processedTemplate.content = content;
-      }
-
-      return {
-        ...acc,
-        [key]: processedTemplate
-      };
-    },
-    {} as typeof templateData
-  );
+function getTemplateWithSubstitutions(contact: Contact, templateName: 'subject' | 'salutation' | 'msg'): string {
+  const templates = getTemplateData();
+  let content = '';
 
   if (templateName === 'subject') {
-    return contact.language === 'de' ? templates.subjectDe.content : templates.subjectEn.content;
-  }
-
-  if (templateName === 'salutation') {
+    content = contact.language === 'de' ? templates.subjectDe.content : templates.subjectEn.content;
+  } else if (templateName === 'salutation') {
     if (contact.formal) {
       if (contact.language === 'de') {
-        return contact.gender === 'male'
-          ? templates.salutationDeFormalMale.content
-          : templates.salutationDeFormalFemale.content;
+        content =
+          contact.gender === 'male'
+            ? templates.salutationDeFormalMale.content
+            : templates.salutationDeFormalFemale.content;
+      } else {
+        content =
+          contact.gender === 'male'
+            ? templates.salutationEnFormalMale.content
+            : templates.salutationEnFormalFemale.content;
       }
-
-      return contact.gender === 'male'
-        ? templates.salutationEnFormalMale.content
-        : templates.salutationEnFormalFemale.content;
+    } else {
+      content = contact.language === 'de' ? templates.salutationDeCasual.content : templates.salutationEnCasual.content;
     }
-
-    return contact.language === 'de' ? templates.salutationDeCasual.content : templates.salutationEnCasual.content;
+  } else if (templateName === 'msg') {
+    content = contact.language === 'de' ? templates.msgDe.content : templates.msgEn.content;
+  } else {
+    throw new Error(`Invalid template name: ${templateName}`);
   }
 
-  if (templateName === 'msg') {
-    return contact.language === 'de' ? templates.msgDe.content : templates.msgEn.content;
-  }
+  // Replace variables in content
+  Object.keys(contact).forEach(key => {
+    const placeholder = `{{${key}}}`;
+    content = content.replace(placeholder, contact[key as keyof Contact] as string);
+  });
 
-  throw new Error(`Invalid template name: ${templateName}`);
-};
+  return content;
+}
 
 /**
  * Writes email draft creation log to the Log sheet
  * @param {Log} log - The log entry to write
  */
-export const logEmailDraftCreation = (log: Log): void => {
+function logEmailDraftCreation(log: Log): void {
   const sheet = getSheetByName('Log');
   const data = getDataA1ToLastRowLastCol(sheet);
   const headers = data[0];
@@ -174,27 +191,27 @@ export const logEmailDraftCreation = (log: Log): void => {
       sheet.getRange(nextRow, colIndex).setValue(value);
     }
   });
-};
+}
 
 /**
  * Shows a toast message in the spreadsheet UI
  * @param {boolean} success - Whether the operation was successful
  */
-export const draftCreationSuccess = (success: boolean): void => {
+function draftCreationSuccess(success: boolean): void {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (success) {
     ss.toast('Emails created successfully!', '✅ Success', 5);
   } else {
     ss.toast('Could not send emails. Please try again.', '❌ Error', 5);
   }
-};
+}
 
 /**
  * Creates draft emails for each email address in the Contacts sheet.
  * @returns {void}
  * @throws {Error} If no active contacts are found in the sheet
  */
-export const createDraftEmailsFromContacts = (): void => {
+export function createDraftEmailsFromContacts(): void {
   const contacts: Contact[] = getContactsArray();
 
   // Filter out inactive and internal contacts
@@ -207,6 +224,11 @@ export const createDraftEmailsFromContacts = (): void => {
   }
 
   try {
+    // Initialize template data and docId before processing contacts
+    if (!globalTemplateData || !globalDocId) {
+      getTemplateData();
+    }
+
     activeExternalContacts.forEach(contact => {
       if (contact.email) {
         const subject = getTemplateWithSubstitutions(contact, 'subject');
@@ -236,4 +258,4 @@ export const createDraftEmailsFromContacts = (): void => {
     draftCreationSuccess(false);
     throw error;
   }
-};
+}
