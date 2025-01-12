@@ -10,7 +10,7 @@ import { SheetName } from '../models';
  * @returns {GoogleAppsScript.Spreadsheet.Sheet} The sheet with the specified name.
  * @throws {Error} If the sheet is not found.
  */
-export function getSheetByName(sheetName: string): GoogleAppsScript.Spreadsheet.Sheet {
+function getSheetByName(sheetName: SheetName): GoogleAppsScript.Spreadsheet.Sheet {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) {
     throw new Error('No active spreadsheet found');

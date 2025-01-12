@@ -1,4 +1,4 @@
-import { createDraftEmailsFromContacts } from './modules/SpreadsheetApp';
+import createDraftEmailsFromContacts from './modules/spreadsheet-app.module';
 
 const onOpen = (): void => {
   SpreadsheetApp.getUi()

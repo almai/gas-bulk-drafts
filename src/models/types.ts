@@ -3,7 +3,9 @@
  */
 
 export type SheetName = 'config' | 'contacts' | 'log';
+
 export type TemplateName = 'subject' | 'salutation' | 'msg';
+
 export type TemplateVariable =
   | 'firstName'
   | 'lastName'
@@ -11,3 +13,16 @@ export type TemplateVariable =
   | 'employeeLastName'
   | 'employeePersonalPronoun'
   | 'employeePossessivePronoun';
+export type ConfigIdKey = 'docId' | 'spreadsheetId' | 'projectId';
+
+export type ConfigTemplateKey =
+  | 'subjectDe'
+  | 'subjectEn'
+  | 'salutationDeFormalMale'
+  | 'salutationDeFormalFemale'
+  | 'salutationEnFormalMale'
+  | 'salutationEnFormalFemale'
+  | 'salutationDeCasual'
+  | 'salutationEnCasual'
+  | 'msgDe'
+  | 'msgEn';

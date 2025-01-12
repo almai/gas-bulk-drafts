@@ -2,16 +2,19 @@
  * @file This file defines the data model for the contact.
  */
 
-export interface Contact {
+interface Employee {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
   gender: 'male' | 'female';
+  isActive: boolean;
+}
+
+export interface Contact extends Employee {
   language: 'de' | 'en';
   formal: boolean;
   isInternal: boolean;
-  isActive: boolean;
   employeeId: number;
   employeeFirstName: string;
   employeeLastName: string;

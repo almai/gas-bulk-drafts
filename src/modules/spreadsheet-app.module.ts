@@ -4,16 +4,16 @@
 import { contactKeys } from '../constants';
 import { templateData as initialTemplateData } from '../constants/template-data';
 import {
-  getDraft,
+  createDraft,
   getNextRowBySheetName,
   getSheetDataByName,
   setValueBySheetNameRowAndCol,
   showToast
 } from '../facades';
-import { Contact, Log, SheetName, TemplateData, TemplateName } from '../models';
+import { ConfigIdKey, Contact, Log, SheetName, TemplateData, TemplateName } from '../models';
 
 let templateData: TemplateData = initialTemplateData;
-let globalDocId: string | null = null;
+let globalDocId: ConfigIdKey | null = null;
 
 /**
  * Retrieves the template data and docId from the Config sheet and stores them.
@@ -67,6 +67,7 @@ function getContacts(): Contact[] {
   const rows = data.slice(1);
   const headerIndexMap = new Map<string, number>();
 
+  // Validate all required columns exist before processing any data
   contactKeys.forEach(key => {
     const index = headers.findIndex(h => h.toLowerCase() === key.toLowerCase());
     if (index === -1) {
@@ -75,6 +76,7 @@ function getContacts(): Contact[] {
     headerIndexMap.set(key, index);
   });
 
+  // Only process rows after validating all columns exist
   return rows
     .filter(row => {
       const isActive = row[headerIndexMap.get('isActive')];
@@ -83,8 +85,18 @@ function getContacts(): Contact[] {
     .map(row => {
       const contact: any = {};
       headerIndexMap.forEach((index, key) => {
-        contact[key] = row[index];
+        let value = row[index];
+        // Type cast boolean string values to actual booleans
+        if (key === 'formal' || key === 'isInternal' || key === 'isActive' || key === 'employeeIsActive') {
+          if (typeof value === 'string') {
+            value = value.toLowerCase() === 'true';
+          } else {
+            value = false; // default to false for invalid values
+          }
+        }
+        contact[key] = value;
       });
+
       return contact;
     });
 }
@@ -120,6 +132,10 @@ function getTemplateWithSubstitutions(contact: Contact, templateName: TemplateNa
     }
   } else if (templateName === 'msg') {
     content = contact.language === 'de' ? templateData.msgDe.content : templateData.msgEn.content;
+
+    if (!content) {
+      throw new Error(`Template content not found for ${templateName}`);
+    }
   } else {
     throw new Error(`Invalid template name: ${templateName}`);
   }
@@ -127,7 +143,7 @@ function getTemplateWithSubstitutions(contact: Contact, templateName: TemplateNa
   // Replace variables in content
   Object.keys(contact).forEach(key => {
     const placeholder = `{{${key}}}`;
-    content = content.replace(placeholder, contact[key as keyof Contact] as string);
+    content = content?.replace(placeholder, contact[key as keyof Contact] as string);
   });
 
   return content;
@@ -140,6 +156,10 @@ function getTemplateWithSubstitutions(contact: Contact, templateName: TemplateNa
 function logEmailDraftCreation(log: Log): void {
   const sheetName: SheetName = 'log';
   const data = getSheetDataByName(sheetName);
+
+  if (!data.length) {
+    throw new Error('Sheet is empty or contains only headers');
+  }
   const headers = data[0];
   const nextRow = getNextRowBySheetName(sheetName);
 
@@ -163,7 +183,7 @@ function logEmailDraftCreation(log: Log): void {
  * @returns {void}
  * @throws {Error} If no active contacts are found in the sheet
  */
-export function createDraftEmailsFromContacts(): void {
+export default function createDraftEmailsFromContacts(): void {
   const contacts: Contact[] = getContacts();
 
   // Filter out inactive and internal contacts
@@ -191,7 +211,7 @@ export function createDraftEmailsFromContacts(): void {
         const emailBody = `${salutation}\n\n${message}`;
 
         const { gmailId, messageId } = <{ gmailId: string; messageId: string }>(
-          getDraft(contact.email, subject, emailBody)
+          createDraft(contact.email, subject, emailBody)
         );
 
         const { id: contactId, firstName, lastName, email } = contact;
