@@ -1,3 +1,7 @@
+/**
+ * @file This file defines the data model for the contact.
+ */
+
 export interface Contact {
   id: number;
   firstName: string;

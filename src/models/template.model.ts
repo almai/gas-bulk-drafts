@@ -1,10 +1,8 @@
-export type variable =
-  | 'firstName'
-  | 'lastName'
-  | 'employeeFirstName'
-  | 'employeeLastName'
-  | 'employeePersonalPronoun'
-  | 'employeePossessivePronoun';
+/**
+ * @file This file defines the data model for the template.
+ */
+
+import { TemplateVariable } from './types';
 
 export interface Template {
   id: number;
@@ -12,7 +10,7 @@ export interface Template {
   description: string;
   content: string;
   language: 'de' | 'en';
-  variables: variable[];
+  variables: TemplateVariable[];
 }
 
 export interface TemplateData {
