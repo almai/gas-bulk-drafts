@@ -100,7 +100,8 @@ Stores template configurations and document IDs:
 - salutationEnFormalFemale
 - salutationDeCasual
 - salutationEnCasual
-- msgDe
+- msgDeCasual
+- msgDeFormal
 - msgEn
 
 ### Log SheetRecords draft email creation with:

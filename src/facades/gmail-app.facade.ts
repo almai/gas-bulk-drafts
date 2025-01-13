@@ -3,7 +3,8 @@
  */
 
 /**
- * Creates a draft email in Gmail
+ * Creates a draft email in Gmail with the specified recipient, subject, and message.
+ * Adds the user's signature to the email message.
  * @param {string} email - The recipient email address
  * @param {string} subject - The email subject
  * @param {string} message - The email message
@@ -14,7 +15,9 @@ export const createDraft = (
   subject: string,
   message: string
 ): { gmailId: string; messageId: string } => {
-  const draft = GmailApp.createDraft(email, subject, message);
+  const { signature } = Gmail.Users.Settings.SendAs.list('me').sendAs.find(account => account.isDefault);
+  const htmlBody = message.concat(signature);
+  const draft = GmailApp.createDraft(email, subject, null, { htmlBody });
   const gmailId = draft.getId();
   const messageId = draft.getMessageId();
 

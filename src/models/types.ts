@@ -24,5 +24,6 @@ export type ConfigTemplateKey =
   | 'salutationEnFormalFemale'
   | 'salutationDeCasual'
   | 'salutationEnCasual'
-  | 'msgDe'
+  | 'msgDeCasual'
+  | 'msgDeFormal'
   | 'msgEn';

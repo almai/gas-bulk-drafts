@@ -65,10 +65,25 @@ export const templateData: TemplateData = {
     language: 'en',
     variables: ['firstName']
   },
-  msgDe: {
+  msgDeCasual: {
     id: 9,
-    name: 'msgDe',
-    description: 'Message in German',
+    name: 'msgDeCasual',
+    description: 'Message in German casual',
+    content: undefined,
+    language: 'de',
+    variables: [
+      'firstName',
+      'lastName',
+      'employeeFirstName',
+      'employeeLastName',
+      'employeePersonalPronoun',
+      'employeePossessivePronoun'
+    ]
+  },
+  msgDeFormal: {
+    id: 10,
+    name: 'msgDeFormal',
+    description: 'Message in German formal',
     content: undefined,
     language: 'de',
     variables: [
@@ -81,7 +96,7 @@ export const templateData: TemplateData = {
     ]
   },
   msgEn: {
-    id: 10,
+    id: 11,
     name: 'msgEn',
     description: 'Message in English',
     content: undefined,
