@@ -13,7 +13,6 @@ import {
 import { ConfigIdKey, Contact, Log, SheetName, TemplateData, TemplateName } from '../models';
 
 let templateData: TemplateData = initialTemplateData;
-let globalDocId: ConfigIdKey | null = null;
 
 /**
  * Retrieves the template data and docId from the Config sheet and stores them.
@@ -41,13 +40,6 @@ function setConfigData(): void {
       [key]: processedTemplate
     };
   }, {} as TemplateData);
-
-  // Find and store docId
-  const docIdRow = data.find(row => row[0] === 'docId');
-  if (docIdRow) {
-    const [, id] = docIdRow;
-    globalDocId = id;
-  }
 }
 
 /**
@@ -90,6 +82,8 @@ function getContacts(): Contact[] {
         if (key === 'formal' || key === 'isInternal' || key === 'isActive' || key === 'employeeIsActive') {
           if (typeof value === 'string') {
             value = value.toLowerCase() === 'true';
+          } else if (typeof value === 'boolean') {
+            // value is already boolean, no need to reassign
           } else {
             value = false; // default to false for invalid values
           }
@@ -131,7 +125,11 @@ function getTemplateWithSubstitutions(contact: Contact, templateName: TemplateNa
         contact.language === 'de' ? templateData.salutationDeCasual.content : templateData.salutationEnCasual.content;
     }
   } else if (templateName === 'msg') {
-    content = contact.language === 'de' ? templateData.msgDe.content : templateData.msgEn.content;
+    if (contact.language === 'de') {
+      content = contact.formal ? templateData.msgDeFormal.content : templateData.msgDeCasual.content;
+    } else {
+      content = templateData.msgEn.content;
+    }
 
     if (!content) {
       throw new Error(`Template content not found for ${templateName}`);
@@ -196,10 +194,7 @@ export default function createDraftEmailsFromContacts(): void {
   }
 
   try {
-    // Initialize template data and docId before processing contacts
-    if (!templateData || !globalDocId) {
-      setConfigData();
-    }
+    setConfigData();
 
     activeExternalContacts.forEach(contact => {
       if (contact.email) {

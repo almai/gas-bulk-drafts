@@ -4,9 +4,8 @@ import { contactSheetData, noActiveExternalContact } from './mocks';
 
 jest.mock('../src/facades', () => ({
   createDraft: jest.fn(),
-  getDocumentContentById: jest.fn(),
-  getDocumentNameById: jest.fn(),
   getNextRowBySheetName: jest.fn(),
+  getSheetByName: jest.fn(),
   getSheetDataByName: jest.fn(),
   setValueBySheetNameRowAndCol: jest.fn(),
   showToast: jest.fn()

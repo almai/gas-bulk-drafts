@@ -30,7 +30,7 @@ export const noActiveExternalContact = [
     'Beck',
     'rufus.beck@example.com',
     'male',
-    'en',
+    'de',
     'FALSE',
     'TRUE',
     'FALSE',
@@ -50,9 +50,6 @@ export const missingRequiredColumnContact = [
 ];
 
 export const templateSheetData = [
-  ['docId', '1LKgyifuAPKvM99jZKIaRlI3BdtwGVmEgl0BTr5pKlQs'],
-  ['spreadsheetId', '15y1_PscTRG3AOKLNZ5dWT5T_oJFdcYFo-dHi0oLhnrc'],
-  ['projectId', '1LKgyifuAPKvM99jZKIaRlI3BdtwGVmEgl0BTr5pKlQs'],
   ['subjectDe', 'Feedback-Fragen für {{employeeFirstName}} {{employeeLastName}}'],
   ['subjectEn', 'Feedback questions for {{employeeFirstName}} {{employeeLastName}}'],
   ['salutationDeFormalMale', 'Sehr geehrter Herr {{lastName}},'],
@@ -62,8 +59,12 @@ export const templateSheetData = [
   ['salutationDeCasual', 'Hallo {{firstName}},'],
   ['salutationEnCasual', 'Hi {{firstName}},'],
   [
-    'msgDe',
-    'messageDe {{firstName}} {{lastName}} {{employeeFirstName}} {{employeeLastName}} {{employeePersonalPronoun}} {{employeePossessivePronoun}}'
+    'msgDeFormal',
+    'messageDeFormal {{firstName}} {{lastName}} {{employeeFirstName}} {{employeeLastName}} {{employeePersonalPronoun}} {{employeePossessivePronoun}}'
+  ],
+  [
+    'msgDeCasual',
+    'messageDeCasual {{firstName}} {{lastName}} {{employeeFirstName}} {{employeeLastName}} {{employeePersonalPronoun}} {{employeePossessivePronoun}}'
   ],
   [
     'msgEn',
