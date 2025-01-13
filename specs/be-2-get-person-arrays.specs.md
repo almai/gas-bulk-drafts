@@ -148,14 +148,6 @@ Create multiple drafts from a selected range in a Google Sheet
     ```aider
     UPDATE test/lib/SpreasheetApp.test.ts:
         ADD describe block for getPersonArrayFromSheet(sheetName: string): void
-    UPDATE test/mocks/SpreasheetApp.ts:
-        ADD test data to test against:
-            |id |firstName|lastName |email                       |gender|formal|language|active|employeeId|contactFor     |
-            |---|---------|---------|----------------------------|------|------|--------|------|----------|---------------|
-            |1  |Dario    |Soller   |test1@maiburg.com           |male  |FALSE |de      |TRUE  |2         |Schwarz, Robert|
-            |2  |Robert   |Schwarz  |test2@maiburg.com           |male  |FALSE |de      |FALSE |2         |Schwarz, Robert|
-            |3  |Malin    |Klingsell|test3@maiburg.com           |femal |FALSE |en      |TRUE  |1         |Soller, Dario  |
-            |4  |Simon    |Maling   |test4@maiburg.com           |male  |FALSE |en      |TRUE  |4         |Maling, Simon  |
     UPDATE test/functions/SpreasheetApp.ts:
         ADD describe block for createDraftEmailsFromContacts(): void
              → when mocking return values from lib functions define functions "as any" or "as jest.Mock" to avoid type errors

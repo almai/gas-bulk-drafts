@@ -106,17 +106,6 @@ Get templates for subject, salutation and message body with substitutions for a 
 
 ## Low-Level Tasks
 
-⚠️Heads-up: The contacts table has changed:
-
-```aider
-    |id |firstName|lastName |email             |gender|formal|language|isInternal|isActive|employeeId|employeeFirstName|employeeLastName|employeeGender|employeeIsActive|employeePersonalPronoun|employeePossessivePronoun|
-    |---|---------|---------|------------------|------|------|--------|----------|--------|----------|-----------------|----------------|--------------|----------------|-----------------------|-------------------------|
-    |1  |Dario    |Soller   |test11@maiburg.com|male  |TRUE  |de      |FALSE     |TRUE    |2         |Robert           |Schwarz         |male          |TRUE            |er                     |sein                     |
-    |2  |Robert   |Schwarz  |test22@maiburg.com|male  |FALSE |de      |FALSE     |TRUE    |1         |Dario            |Soller          |male          |TRUE            |er                     |sein                     |
-    |3  |Malin    |Klingsell|test33@maiburg.com|femal |TRUE  |en      |FALSE     |TRUE    |4         |Simon            |Maling          |male          |TRUE            |he                     |his                      |
-    |4  |Simon    |Maling   |test44@maiburg.com|male  |FALSE |en      |FALSE     |TRUE    |3         |Malin            |Klingsell       |female        |TRUE            |she                    |her                      |
-```
-
 1. Get templates with substitutions for a contact
 
     ```aider
@@ -145,17 +134,6 @@ Get templates for subject, salutation and message body with substitutions for a 
             → concatenate salutation and msg to create the email body
             → call createDraft() with the subject and email body
     ```
-
-⚠️Heads-up: The contacts table has changed:
-
-```aider
-    |id |firstName|lastName |email             |gender|formal|language|isInternal|isActive|employeeId|employeeFirstName|employeeLastName|employeeGender|employeeIsActive|employeePersonalPronoun|employeePossessivePronoun|
-    |---|---------|---------|------------------|------|------|--------|----------|--------|----------|-----------------|----------------|--------------|----------------|-----------------------|-------------------------|
-    |1  |Dario    |Soller   |test11@maiburg.com|male  |TRUE  |de      |FALSE     |TRUE    |2         |Robert           |Schwarz         |male          |TRUE            |er                     |sein                     |
-    |2  |Robert   |Schwarz  |test22@maiburg.com|male  |FALSE |de      |FALSE     |TRUE    |1         |Dario            |Soller          |male          |TRUE            |er                     |sein                     |
-    |3  |Malin    |Klingsell|test33@maiburg.com|femal |TRUE  |en      |FALSE     |TRUE    |4         |Simon            |Maling          |male          |TRUE            |he                     |his                      |
-    |4  |Simon    |Maling   |test44@maiburg.com|male  |FALSE |en      |FALSE     |TRUE    |3         |Malin            |Klingsell       |female        |TRUE            |she                    |her                      |
-```
 
 3. Write tests for each new function, update test for changed functions
 
