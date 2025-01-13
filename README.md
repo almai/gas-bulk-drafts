@@ -1,124 +1,184 @@
-# Google Apps Script Development 💯
+# Bulk Email to Employees Contacts
 
-The Google Apps Script Starter kit supports the new **V8 JavaScript runtime** that powers Chrome and Node.js. You can write code using modern ECMAScript syntax like Arrow functions, Classes, Template Literals, Destructuring and more.
+A Google Apps Script application that automates creating draft emails for employess contacts with customizable templates and logging capabilities.
 
-![Google Apps Script Development with ES6](images/google-apps-script-development.png)
+## Features
 
-Please follow the 👉 **[step-by-step video tutorial](https://www.youtube.com/watch?v=KxdCIbeO4Uk)** 👈 for quickly getting started with Apps Script development inside Visual Studio Code. It is recommended that you install the [Extension Pack](https://marketplace.visualstudio.com/items?itemName=labnol.google-apps-script) for working with Apps Script files in VS Code.
+- Creates draft emails from contact data in Google Sheets
+- Supports multiple languages (English and German)
+- Handles formal and casual salutations
+- Customizable templates with variable substitution
+- Automatic logging of created drafts
+- Toast notifications for operation status
 
-You can build Google Workspace add-ons (for Google Docs, Slides, Gmail and Google Sheets), web applications and workflow automation routines with next-generation JavaScript.
+## Structure
 
-The starter kit is used by [Digital Inspiration](https://digitalinspiration.com/) for building popular Google add-ons including [Gmail Mail Merge](https://workspace.google.com/marketplace/app/mail_merge_with_attachments/223404411203), [Google Forms Notifications](https://workspace.google.com/marketplace/app/email_notifications_for_google_forms/984866591130) and [Document Studio](https://workspace.google.com/marketplace/app/document_studio/429444628321).
+### Core Modules
 
-## Build with Google Apps Script 🚀
+- **SpreadsheetApp Module**: Main functionality for handling spreadsheet operations
+- **GmailApp Module**: Email draft creation and management
+- **DocumentApp Module**: Document content handling
 
-Setting up a modern development environment for building [Google Apps Script](https://www.labnol.org/topic/google-apps-script/) projects is easy and quick (**[video tutorial](https://www.youtube.com/watch?v=KxdCIbeO4Uk)**).
+### Models
 
-You also need to install Node.js which includes the npm package manager.
+- **Contact**: Contact information and preferences
+- **Template**: Email template structure and variables
+- **Log**: Draft creation logging data
+- **Types**: Common TypeScript type definitions
 
-### :package: Getting Started
+### Facades
 
-**1.** Clone the repository and install npm dependencies and [utilities](TOOLS.md).
+- **SpreadsheetApp Facade**: Interface for Google Sheets operations
+- **GmailApp Facade**: Interface for Gmail operations
+- **DocumentApp Facade**: Interface for Google Docs operations
 
-```
-git clone https://github.com/labnol/apps-script-starter my-project
-cd my-project
-npm install
-```
+## Requirements
 
-Update: The `git clone` command adds a .git folder to your folder that pertains to the Apps Script Starter project and not your local project. You should either re-init the repository or use `degit` to clone the repository.
+- Google Apps Script environment
+- Google Sheets
+- Gmail access
+- TypeScript support
 
-```
-npx degit labnol/apps-script-starter my-project
-```
+## Setup
 
-**2.** Log in to Google clasp and authorize using your Google account.
+1. Enable Google Apps Script API
+2. Configure clasp for deployment
+3. Set up required Google Sheets:
+- Employees sheet
+- Contacts sheet
+- Config sheet
+- Log sheet
 
-```
-npx clasp login
-```
+## Sheet Structure
 
-**3.** Create a new Google Script bound to a Google Sheet (or set the type as standalone to create a standalone script in your Google Drive)
+### Employees Sheet
 
-```
-npx clasp create --type sheets --title "My Apps Script Project" --rootDir ./dist
-```
+Contains employee information with columns:
 
-**4.** Include the necessary [OAuth Scopes](./scopes.md) in the [appsscript.json](./appsscript.json) file
+- id
+- firstName	lastName
+- gender
+- isActive
+- email
 
-**5.** Deploy the project
+### Contacts Sheet
 
-```
-npm run deploy
-```
+Contains contact information with columns:
 
-The `dist` directory contains the bundled code that is pushed to Google Apps Script.
+- id
+- firstName
+- lastName
+- email
+- gender
+- formal
+- language
+- isInternal
+- isActive
+- employeeId
+- employeeFirstName
+- employeeLastName
+- employeeGender
+- employeeIsActive
+- employeePersonalPronoun
+- employeePossessivePronoun
 
-![Google Apps Script - Setup Development Environment](images/npm-install.gif)
+### Config Sheet
 
-#### Enable JavaScript v8 Runtime
+Stores template configurations and document IDs:
 
-Inside the Google Apps Script editor, select View > Show project manifest to open the `appsscript.json` manifest file in the editor. Add a new `runtimeVersion` field and set the value to `V8`. Save your script.
+**Ids**:
+- docId
+- spreadsheetId
+- projectId
 
-![Google Apps Script - v8 Runtime](images/apps-script-v8.png)
+**Templates**
+- subjectDe
+- subjectEn
+- salutationDeFormalMale
+- salutationDeFormalFemale
+- salutationEnFormalMale
+- salutationEnFormalFemale
+- salutationDeCasual
+- salutationEnCasual
+- msgDe
+- msgEn
 
-### The .claspignore file
+### Log SheetRecords draft email creation with:
 
-The `.claspignore` file allows you to specify file and directories that you do not wish to not upload to your Google Apps Script project via `clasp push`.
+- contactId
+- firstName
+- lastName
+- email
+- gmailId
+- draftUrl
+- timestamp
 
-The default `.claspignore` file in the Apps Script Starter kit will push all the JS and HTML inside the `rootDir` folder and ignore all the other files.
+## Usage
 
-## :beginner: Using Git with Google Apps Script
+1. Open the Google Sheet containing contact data
+2. Use the "Advanced" menu
+3. Select "Create Drafts from Contacts"
+4. Draft emails will be created based on templates
+5. Check the Log sheet for creation records
 
-![Google Apps Script - Github](images/github-apps-script.png)
+## Development
 
-Create a new repository in Github and make a note of the URL of the new repository. Next, open the terminal and run the above commands to push your Apps Script project to Github.
+### Technologies- TypeScript
 
-## Custom Google Sheet functions
+- Google Apps Script
+- Jest for testing
+- ESLint for code quality
+- Prettier for code formatting
 
-Please read [the tutorial](./FUNCTIONS.md) on how to write custom functions for Google Sheets using Apps Script.
+### Testing
 
-## Testing your Google Apps Script code
-
-You can run tests with jest using
-
-```
+```bash
 npm run test
 ```
 
-This has limitations:
+### Building
 
-- You _can_ test code that has no dependencies to Google App Script code, e.g.
-
-```
-const hasCpuTime = () => !(Date.now() - START_TIME > ONE_MINUTE * 4);
-
+```bash
+npm run build
 ```
 
-- You _can not_ test code that has dependencies to Google App Script code, e.g.
+### Deployment
 
-```
-function notTestable() {
-    Logger.log("notTestable"); // <-- Google Apps Script function. Not callable in dev
-    SpreadsheetApp.getUi(); // <-- Google Apps Script function. Not callable in dev
-    ...
-}
+```bash
+npm run deploy
 ```
 
-Check out [jest 'expects' here](https://jestjs.io/docs/expect)
+## Design Principles
 
-## :fire: Meet the Developer
+- Modular architecture with clear separation of concerns
+- Facade pattern for Google services abstraction
+- Strong typing with TypeScript
+- Comprehensive error handling
+- Efficient data caching
+- Clear logging and user feedback
 
-<img align="left" width="100" height="100" src="https://pbs.twimg.com/profile_images/1320276905271070727/zQUrdqxO_200x200.jpg">
+## Error Handling
 
-[Amit Agarwal](https://www.labnol.org/about) is a web geek, Google Developers Expert (Google Workspace, Google Apps Script), Google Cloud Innovator, and author of [labnol.org](https://www.labnol.org/), a popular tech how-to website.
+- Validates required columns
+- Checks for active contacts
+- Verifies template content
+- Provides user feedback via toast messages
+- Logs errors appropriately
 
-He frequently uses [Google Apps Script](https://www.labnol.org/topic/google-apps-script/) to automate workflows and enhance productivity. Reach him on [Twitter](https://twitter.com/labnol) or email `amit@labnol.org`
+## Contributing
 
-### :cherry_blossom: Contribution
+1. Fork the repository
+2. Create a feature branch
+3. Commit changes
+4. Push to the branch
+5. Create a Pull Request
 
-Contributions and feature requests are welcome. If you are using the Google Apps Script starter package and fixed a bug for yourself, please consider submitting a PR!
+## License
 
-### :lock: License
+MIT
 
-[MIT License](https://github.com/labnol/apps-script-starter/blob/master/LICENSE) (c) [Amit Agarwal](https://www.labnol.org/about/)
+[MIT License](https://github.com/almai/blob/master/LICENSE)
+
+## Author
+
+[Alex Maiburg](https://alexmaiburg.de)
