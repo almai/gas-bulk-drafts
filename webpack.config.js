@@ -20,7 +20,8 @@ module.exports = {
   },
   output: {
     filename: 'code.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    clean: true
   },
   plugins: [
     new ESLintPlugin(),
