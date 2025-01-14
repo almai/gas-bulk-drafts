@@ -148,6 +148,10 @@ npm run build
 npm run deploy
 ```
 
+## Deployment
+
+1. Edit .clasp.json. Replace scriptId with your Google Apps Script ID and parentId with the Google Spreadsheet ID.
+
 ## Design Principles
 
 - Modular architecture with clear separation of concerns
