@@ -10,17 +10,17 @@ import {
   setValueBySheetNameRowAndCol,
   showToast
 } from '../facades';
-import { ConfigIdKey, Contact, Log, SheetName, TemplateData, TemplateName } from '../models';
+import { Contact, Log, SheetName, TemplateData, TemplateName } from '../models';
 
 let templateData: TemplateData = initialTemplateData;
 
 /**
- * Retrieves the template data and docId from the Config sheet and stores them.
+ * Retrieves the template data and docId from the Template sheet and stores them.
  * @returns {void}
  */
-function setConfigData(): void {
-  // Get the Config sheet and its data
-  const data = getSheetDataByName('config');
+function setTemplateData(): void {
+  // Get the Template sheet and its data
+  const data = getSheetDataByName('templates');
 
   // Load all templates and create processed templates
   templateData = Object.entries(initialTemplateData).reduce((acc, [key, template]) => {
@@ -96,7 +96,7 @@ function getContacts(): Contact[] {
 }
 
 /**
- * Retrieves a template with variables replaced by values from the Config sheet.
+ * Retrieves a template with variables replaced by values from the Template sheet.
  * @param {Contact} contact - The contact object to use for variable substitution.
  * @param {'subject' | 'salutation' | 'msg'} templateName - The name of the template to retrieve.
  * @returns {string} The template content with variables replaced by values.
@@ -194,7 +194,7 @@ export default function createDraftEmailsFromContacts(): void {
   }
 
   try {
-    setConfigData();
+    setTemplateData();
 
     activeExternalContacts.forEach(contact => {
       if (contact.email) {

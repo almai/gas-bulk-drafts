@@ -1,15 +1,20 @@
-# Bulk Email to Employees Contacts
+# Bulk Email Drafts to Employees Contacts
 
-A Google Apps Script application that automates creating draft emails for employess contacts with customizable templates and logging capabilities.
+A Google Apps Script application that automates creating draft emails for employees contacts with customizable templates and logging capabilities.
 
 ## Features
 
 - Creates draft emails from contact data in Google Sheets
+- Appends the Gmail signature of the default user
 - Supports multiple languages (English and German)
 - Handles formal and casual salutations
 - Customizable templates with variable substitution
 - Automatic logging of created drafts
 - Toast notifications for operation status
+
+## Google Sheet Example
+
+Head over to the [Google Sheet Example](https://docs.google.com/spreadsheets/d/15y1_PscTRG3AOKLNZ5dWT5T_oJFdcYFo-dHi0oLhnrc/edit?gid=176114814#gid=176114814), copy it to your Google Drive, and start using the application.
 
 ## Structure
 
@@ -17,7 +22,6 @@ A Google Apps Script application that automates creating draft emails for employ
 
 - **SpreadsheetApp Module**: Main functionality for handling spreadsheet operations
 - **GmailApp Module**: Email draft creation and management
-- **DocumentApp Module**: Document content handling
 
 ### Models
 
@@ -30,7 +34,6 @@ A Google Apps Script application that automates creating draft emails for employ
 
 - **SpreadsheetApp Facade**: Interface for Google Sheets operations
 - **GmailApp Facade**: Interface for Gmail operations
-- **DocumentApp Facade**: Interface for Google Docs operations
 
 ## Requirements
 
@@ -46,7 +49,7 @@ A Google Apps Script application that automates creating draft emails for employ
 3. Set up required Google Sheets:
 - Employees sheet
 - Contacts sheet
-- Config sheet
+- Templates sheet
 - Log sheet
 
 ## Sheet Structure
@@ -82,14 +85,9 @@ Contains contact information with columns:
 - employeePersonalPronoun
 - employeePossessivePronoun
 
-### Config Sheet
+### Templates Sheet
 
-Stores template configurations and document IDs:
-
-**Ids**:
-- docId
-- spreadsheetId
-- projectId
+Stores templates:
 
 **Templates**
 - subjectDe
@@ -117,10 +115,11 @@ Stores template configurations and document IDs:
 ## Usage
 
 1. Open the Google Sheet containing contact data
-2. Use the "Advanced" menu
-3. Select "Create Drafts from Contacts"
-4. Draft emails will be created based on templates
-5. Check the Log sheet for creation records
+2. Add new contacts to the "Contacts" sheet and link it to the employee by entering the employeeId
+3. Use the "Extras" menu
+4. Select "✉️ Create Draft Emails"
+5. Draft emails will be created based on templates
+6. Check the Log sheet for creation records
 
 ## Development
 
@@ -176,10 +175,12 @@ npm run deploy
 
 ## License
 
-MIT
-
 [MIT License](https://github.com/almai/blob/master/LICENSE)
 
 ## Author
 
 [Alex Maiburg](https://alexmaiburg.de)
+
+## Reporting Issues
+
+If you find a bug head over to [GitHub](https://github.com/almai/bulk-email/issues/new) and create a new issue.

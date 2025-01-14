@@ -2,7 +2,7 @@
  * @file This file contains the types used in the project.
  */
 
-export type SheetName = 'config' | 'contacts' | 'log';
+export type SheetName = 'templates' | 'contacts' | 'log';
 
 export type TemplateName = 'subject' | 'salutation' | 'msg';
 
@@ -13,9 +13,9 @@ export type TemplateVariable =
   | 'employeeLastName'
   | 'employeePersonalPronoun'
   | 'employeePossessivePronoun';
-export type ConfigIdKey = 'docId' | 'spreadsheetId' | 'projectId';
+export type TemplateIdKey = 'docId' | 'spreadsheetId' | 'projectId';
 
-export type ConfigTemplateKey =
+export type TemplateKey =
   | 'subjectDe'
   | 'subjectEn'
   | 'salutationDeFormalMale'

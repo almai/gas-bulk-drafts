@@ -1,6 +1,6 @@
 {
   "name": "bulk-email",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Send bulk email campaigns with Gmail and Google Sheets",
   "author": "Alex Maiburg <alex@maiburg.com>",
   "license": "MIT",
