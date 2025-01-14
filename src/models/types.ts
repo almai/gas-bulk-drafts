@@ -2,7 +2,7 @@
  * @file This file contains the types used in the project.
  */
 
-export type SheetName = 'template' | 'contacts' | 'log';
+export type SheetName = 'templates' | 'contacts' | 'log';
 
 export type TemplateName = 'subject' | 'salutation' | 'msg';
 

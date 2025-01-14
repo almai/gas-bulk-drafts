@@ -20,7 +20,7 @@ let templateData: TemplateData = initialTemplateData;
  */
 function setTemplateData(): void {
   // Get the Template sheet and its data
-  const data = getSheetDataByName('template');
+  const data = getSheetDataByName('templates');
 
   // Load all templates and create processed templates
   templateData = Object.entries(initialTemplateData).reduce((acc, [key, template]) => {
