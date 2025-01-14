@@ -2,8 +2,8 @@ import createDraftEmailsFromContacts from './modules/spreadsheet-app.module';
 
 const onOpen = (): void => {
   SpreadsheetApp.getUi()
-    .createMenu('Advanced')
-    .addItem('Create Drafts from Contacts', 'createDraftEmailsFromContacts')
+    .createMenu('Extras')
+    .addItem('✉️ Create Draft Emails', 'createDraftEmailsFromContacts')
     .addToUi();
 };
 

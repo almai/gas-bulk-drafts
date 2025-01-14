@@ -2,7 +2,7 @@
  * @file This file defines the data model for the template.
  */
 
-import { TemplateVariable, ConfigTemplateKey } from './types';
+import { TemplateVariable, TemplateKey } from './types';
 
 export interface Template {
   id: number;
@@ -14,5 +14,5 @@ export interface Template {
 }
 
 export type TemplateData = {
-  [key in ConfigTemplateKey]: Template;
+  [key in TemplateKey]: Template;
 };
