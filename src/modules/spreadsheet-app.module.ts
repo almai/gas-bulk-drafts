@@ -140,8 +140,8 @@ function getTemplateWithSubstitutions(contact: Contact, templateName: TemplateNa
 
   // Replace variables in content
   Object.keys(contact).forEach(key => {
-    const placeholder = `{{${key}}}`;
-    content = content?.replace(placeholder, contact[key as keyof Contact] as string);
+    const regex = new RegExp(`{{${key}}}`, 'g');
+    content = content?.replace(regex, contact[key as keyof Contact] as string);
   });
 
   return content;
