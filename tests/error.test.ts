@@ -1,6 +1,6 @@
 import { getSheetDataByName, showToast } from '../src/facades';
 import createDraftEmailsFromContacts from '../src/modules/spreadsheet-app.module';
-import { contactSheetData, noActiveExternalContact } from './mocks';
+import { contactSheetData, missingRequiredColumnContact, noActiveExternalContact } from './mocks';
 
 jest.mock('../src/facades', () => ({
   createDraft: jest.fn(),
@@ -25,12 +25,7 @@ describe('SpreadsheetApp Module', () => {
     });
 
     test('throw error if required column was not found', async () => {
-      const missingRequiredColumn = [
-        ['id', 'firstName', 'lastName', 'gender', 'language', 'formal', 'isInternal', 'isActive'], // missing 'email'
-        ['1.0', 'Rufus', 'Beck', 'male', 'en', 'FALSE', 'FALSE', 'TRUE']
-      ];
-
-      getSheetDataByNameMock.mockReturnValue(missingRequiredColumn);
+      getSheetDataByNameMock.mockReturnValue(missingRequiredColumnContact);
 
       expect(() => createDraftEmailsFromContacts()).toThrow("Required column 'email' not found in sheet");
       expect(showToast).not.toHaveBeenCalled();
