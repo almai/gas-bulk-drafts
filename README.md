@@ -179,7 +179,7 @@ npm run deploy
 
 ## License
 
-[MIT License](https://github.com/almai/blob/master/LICENSE)
+[MIT License](https://github.com/almai/gas-bulk-drafts/blob/main/LICENSE)
 
 ## Author
 
@@ -187,4 +187,8 @@ npm run deploy
 
 ## Reporting Issues
 
-If you find a bug head over to [GitHub](https://github.com/almai/bulk-email/issues/new) and create a new issue.
+If you find a bug head over to [GitHub](https://github.com/almai/gas-bulk-drafts/issues/new) and create a new issue.
+
+## Acknowledgements
+
+Heavily inspired by [Google Apps Script Development 💯](https://github.com/labnol/apps-script-starter) by [Amit Agarwal](https://labnol.org/).
